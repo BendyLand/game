@@ -66,3 +66,64 @@ class Hero:
         self.damage = CHARACTER_STATS[character_class]['damage']
         self.defense = CHARACTER_STATS[character_class]['defense']
         self.speed = CHARACTER_STATS[character_class]['speed']
+
+ENEMY_STATS = {
+    "orc": {
+        "health": 150,
+        "damage": 30,
+        "defense": 30,
+        "speed": 0.5
+    },
+    "spirit": {
+        "health": 20,
+        "damage": 150,
+        "defense": 0.1,
+        "speed": 3
+    },
+    "zombie": {
+        "health": 20,
+        "damage": 10,
+        "defense": 5,
+        "speed": 1.5
+    }
+}
+
+class Enemy:
+    def __init__(self, type):
+        self.type = type
+        self.health = None
+        self.damage = None
+        self.defense = None
+        self.speed = None
+        self.assign_stats()
+
+    def __repr__(self):
+        return \
+        f"""
+        This enemy is a(n) {self.type}.
+        It has {self.health} health.
+        It has {self.damage} damage.
+        It has {self.defense} defense.
+        It has {self.speed} speed.
+        """
+
+    def assign_stats(self):
+        if self.type not in ENEMY_STATS.keys():
+            print("Invalid enemy type")
+            raise ValueError
+
+        self.health = ENEMY_STATS[self.type]['health']
+        self.damage = ENEMY_STATS[self.type]['damage']
+        self.defense = ENEMY_STATS[self.type]['defense']
+        self.speed = ENEMY_STATS[self.type]['speed']
+
+    
+
+            
+orc = Enemy('orc')
+spirit = Enemy('spirit')
+zombie = Enemy('zombie')
+
+print(orc)
+print(spirit)
+print(zombie)
