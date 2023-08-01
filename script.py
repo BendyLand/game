@@ -22,6 +22,8 @@ Test all of the methods you created on both of the objects you create.
 Create some methods, or additional attributes, that make your two Classes able to interact with each other.
 '''
 
+import random
+
 CHARACTER_STATS = {
     "knight": {
         "health": 100,
@@ -42,35 +44,6 @@ CHARACTER_STATS = {
         "speed": 2
     }
 }
-class Hero:
-    def __init__(self, name):
-        self.name = name
-        self.character_class = None
-        self.health = None
-        self.damage = None
-        self.defense = None
-        self.speed = None
-        self.choose_character()
-
-    def __repr__(self):
-        return f"{self.name} is a {self.character_class}!"
-
-    def choose_character(self):
-        character_class = input("Please select either 'knight', 'wizard', or 'goblin': ").lower()
-        while character_class not in CHARACTER_STATS:
-            print("Not a valid character class!")
-            character_class = input("Please select either 'knight', 'wizard', or 'goblin': ").lower()
-
-        self.character_class = character_class
-        self.health = CHARACTER_STATS[character_class]['health']
-        self.damage = CHARACTER_STATS[character_class]['damage']
-        self.defense = CHARACTER_STATS[character_class]['defense']
-        self.speed = CHARACTER_STATS[character_class]['speed']
-
-    def attack(self, other):
-        attack_damage = self.damage * self.speed
-        effective_damage = attack_damage - other.defense
-        other.health -= abs(effective_damage)
 
 ENEMY_STATS = {
     "orc": {
@@ -92,6 +65,74 @@ ENEMY_STATS = {
         "speed": 1.5
     }
 }
+class Hero:
+    def __init__(self, name):
+        self.name = name
+        self.character_class = None
+        self.health = None
+        self.damage = None
+        self.defense = None
+        self.speed = None
+        self.is_turn = True
+        self.choose_character()
+
+    def __repr__(self):
+        return f"{self.name} is a {self.character_class}!"
+
+    def choose_character(self):
+        character_class = input("Please select either 'knight', 'wizard', or 'goblin': ").lower()
+        while character_class not in CHARACTER_STATS:
+            print("Not a valid character class!")
+            character_class = input("Please select either 'knight', 'wizard', or 'goblin': ").lower()
+
+        self.character_class = character_class
+        self.health = CHARACTER_STATS[character_class]['health']
+        self.damage = CHARACTER_STATS[character_class]['damage']
+        self.defense = CHARACTER_STATS[character_class]['defense']
+        self.speed = CHARACTER_STATS[character_class]['speed']
+        self.start_game(Enemy(self.select_random_enemy()))
+
+    def attack(self, other):
+        attack_damage = self.damage * self.speed
+        effective_damage = attack_damage - other.defense
+        other.health -= abs(effective_damage)
+        return f"The {other.type} now has {other.health} health."
+
+    def select_random_enemy(self):
+        return random.choice(['orc', 'spirit', 'zombie'])
+
+    def check_win(self, other):
+        if self.health <= 0:
+            return f"{self.name} has succumbed to their injuries!"
+        elif other.health <= 0:
+            return f"{self.name} has defeated the {other.type}"
+        else:
+            if self.is_turn:
+                print(f"{other.type} is still alive with {other.health}!")
+            else:
+                print(f"You're still alive with {self.health}, keep it up!")
+            other.change_turns(self)
+
+    def start_game(self, other):
+        print(\
+            f"""
+            Welcome, {self.name}!
+            It is great to have you here.
+            We are in need of a Hero such as yourself!
+            A(n) {other.type} has attacked, and we are all in danger!
+            Please, save us!
+            """
+            )
+        while self.health > 0 and other.health > 0:
+            if self.is_turn:
+                print(f"You attack the {other.type}.")
+                self.attack(other)
+                self.check_win(other)
+            else:
+                other.attack(self)
+                self.check_win(other)
+        return "Thanks for playing!"
+
 
 class Enemy:
     def __init__(self, type):
@@ -100,6 +141,7 @@ class Enemy:
         self.damage = None
         self.defense = None
         self.speed = None
+        self.is_turn = False
         self.assign_stats()
 
     def __repr__(self):
@@ -110,6 +152,7 @@ class Enemy:
         It has {self.damage} damage.
         It has {self.defense} defense.
         It has {self.speed} speed.
+        It is my turn: {self.is_turn}.
         """
 
     def assign_stats(self):
@@ -126,15 +169,19 @@ class Enemy:
         attack_damage = self.damage * self.speed
         effective_damage = attack_damage - other.defense
         other.health -= abs(effective_damage)
+        return f"You now have {other.health} health."
+
+    def change_turns(self, other):
+        if self.is_turn:
+            self.is_turn = False
+            other.is_turn = True
+        else:
+            other.is_turn = False
+            self.is_turn = True
+
 
 
 ben = Hero('Ben')
 
-orc = Enemy('orc')
-spirit = Enemy('spirit')
-zombie = Enemy('zombie')
 
-print(orc)
-ben.attack(orc)
-print(orc)
 
