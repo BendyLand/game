@@ -67,6 +67,11 @@ class Hero:
         self.defense = CHARACTER_STATS[character_class]['defense']
         self.speed = CHARACTER_STATS[character_class]['speed']
 
+    def attack(self, other):
+        attack_damage = self.damage * self.speed
+        effective_damage = attack_damage - other.defense
+        other.health -= abs(effective_damage)
+
 ENEMY_STATS = {
     "orc": {
         "health": 150,
@@ -117,13 +122,19 @@ class Enemy:
         self.defense = ENEMY_STATS[self.type]['defense']
         self.speed = ENEMY_STATS[self.type]['speed']
 
-    
+    def attack(self, other):
+        attack_damage = self.damage * self.speed
+        effective_damage = attack_damage - other.defense
+        other.health -= abs(effective_damage)
 
-            
+
+ben = Hero('Ben')
+
 orc = Enemy('orc')
 spirit = Enemy('spirit')
 zombie = Enemy('zombie')
 
 print(orc)
-print(spirit)
-print(zombie)
+ben.attack(orc)
+print(orc)
+
